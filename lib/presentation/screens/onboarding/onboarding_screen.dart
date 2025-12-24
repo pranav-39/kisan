@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import '../../../core/constants/app_constants.dart';
+
 import '../../../core/constants/app_colors.dart';
+import '../../../core/constants/app_constants.dart';
 import '../../../core/localization/app_localizations.dart';
 import '../../providers/language_provider.dart';
 import '../home/home_screen.dart';
@@ -19,19 +20,19 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   int _currentPage = 0;
 
   final List<OnboardingPageData> _pages = [
-    OnboardingPageData(
+    const OnboardingPageData(
       icon: Icons.agriculture,
       titleKey: 'onboarding_title_1',
       descriptionKey: 'onboarding_desc_1',
       color: AppColors.primary,
     ),
-    OnboardingPageData(
+    const OnboardingPageData(
       icon: Icons.camera_alt,
       titleKey: 'onboarding_title_2',
       descriptionKey: 'onboarding_desc_2',
       color: AppColors.secondary,
     ),
-    OnboardingPageData(
+    const OnboardingPageData(
       icon: Icons.mic,
       titleKey: 'onboarding_title_3',
       descriptionKey: 'onboarding_desc_3',
@@ -51,28 +52,28 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     });
   }
 
-  void _nextPage() {
+  Future<void> _nextPage() async {
     if (_currentPage < _pages.length - 1) {
-      _pageController.nextPage(
+      await _pageController.nextPage(
         duration: AppConstants.animationDuration,
         curve: Curves.easeInOut,
       );
     } else {
-      _completeOnboarding();
+      await _completeOnboarding();
     }
   }
 
-  void _skip() {
-    _completeOnboarding();
+  Future<void> _skip() async {
+    await _completeOnboarding();
   }
 
   Future<void> _completeOnboarding() async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool(SharedPrefKeys.isFirstLaunch, false);
-    
+
     if (!mounted) return;
-    
-    Navigator.of(context).pushReplacement(
+
+    await Navigator.of(context).pushReplacement(
       MaterialPageRoute(builder: (_) => const HomeScreen()),
     );
   }
@@ -81,7 +82,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   Widget build(BuildContext context) {
     final localizations = AppLocalizations.of(context);
     final languageProvider = Provider.of<LanguageProvider>(context);
-    
+
     return Scaffold(
       body: SafeArea(
         child: Column(
@@ -193,7 +194,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             width: 150,
             height: 150,
             decoration: BoxDecoration(
-              color: data.color.withOpacity(0.1),
+              color: data.color.withAlpha(25),
               shape: BoxShape.circle,
             ),
             child: Icon(
@@ -206,16 +207,16 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
           Text(
             localizations?.translate(data.titleKey) ?? data.titleKey,
             style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-              fontWeight: FontWeight.bold,
-            ),
+                  fontWeight: FontWeight.bold,
+                ),
             textAlign: TextAlign.center,
           ),
           const SizedBox(height: 16),
           Text(
             localizations?.translate(data.descriptionKey) ?? data.descriptionKey,
             style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-              color: Theme.of(context).textTheme.bodySmall?.color,
-            ),
+                  color: Theme.of(context).textTheme.bodySmall?.color,
+                ),
             textAlign: TextAlign.center,
           ),
         ],

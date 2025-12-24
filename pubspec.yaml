@@ -38,7 +38,8 @@ dependencies:
   # Voice & Speech
   flutter_tts: ^3.8.5
   speech_to_text: ^6.4.1
-  
+  flutter_gemini: ^2.0.1
+
   # UI Components
   google_fonts: ^6.1.0
   flutter_svg: ^2.0.9
@@ -52,11 +53,11 @@ dependencies:
   json_annotation: ^4.8.1
   
   # Firebase (optional - add when configuring)
-  # firebase_core: ^2.24.2
-  # cloud_firestore: ^4.13.6
-  # firebase_auth: ^4.15.3
-  # firebase_storage: ^11.5.6
-  # firebase_messaging: ^14.7.10
+  firebase_core: ^2.24.2
+  cloud_firestore: ^4.13.6
+  firebase_auth: ^4.15.3
+  firebase_storage: ^11.5.6
+  firebase_messaging: ^14.7.10
 
   cupertino_icons: ^1.0.6
 

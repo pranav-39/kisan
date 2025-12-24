@@ -78,7 +78,7 @@ class DiagnosisScreen extends StatelessWidget {
                       fit: BoxFit.cover,
                     ),
                   )
-                : Column(
+                : const Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Icon(
@@ -86,7 +86,7 @@ class DiagnosisScreen extends StatelessWidget {
                         size: 48,
                         color: AppColors.textSecondaryLight,
                       ),
-                      const SizedBox(height: 16),
+                      SizedBox(height: 16),
                       Text(
                         'Tap to capture or select image',
                         style: TextStyle(
@@ -354,7 +354,7 @@ class _DiagnosisHistoryItem extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                 decoration: BoxDecoration(
-                  color: _getSeverityColor(diagnosis.severity!).withOpacity(0.1),
+                  color: _getSeverityColor(diagnosis.severity!).withAlpha(25),
                   borderRadius: BorderRadius.circular(4),
                 ),
                 child: Text(

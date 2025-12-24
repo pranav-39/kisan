@@ -53,7 +53,7 @@ class _MarketScreenState extends State<MarketScreen> {
         color: Theme.of(context).cardColor,
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withAlpha(12),
             blurRadius: 4,
             offset: const Offset(0, 2),
           ),
@@ -63,7 +63,6 @@ class _MarketScreenState extends State<MarketScreen> {
         children: [
           Expanded(
             child: DropdownButtonFormField<String>(
-              value: provider.selectedCrop,
               decoration: InputDecoration(
                 labelText: loc?.selectCrop ?? 'Select Crop',
                 contentPadding: const EdgeInsets.symmetric(horizontal: 12),
@@ -183,7 +182,7 @@ class _MarketPriceCard extends StatelessWidget {
                   width: 48,
                   height: 48,
                   decoration: BoxDecoration(
-                    color: _getCropColor(price.cropName).withOpacity(0.1),
+                    color: _getCropColor(price.cropName).withAlpha(25),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Icon(
@@ -248,7 +247,7 @@ class _MarketPriceCard extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: AppColors.secondary.withOpacity(0.05),
+                  color: AppColors.secondary.withAlpha(12),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Row(
@@ -293,7 +292,7 @@ class _MarketPriceCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
+        color: color.withAlpha(25),
         borderRadius: BorderRadius.circular(4),
       ),
       child: Row(
@@ -340,9 +339,9 @@ class _MarketPriceCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
+        color: color.withAlpha(25),
         borderRadius: BorderRadius.circular(4),
-        border: Border.all(color: color.withOpacity(0.3)),
+        border: Border.all(color: color.withAlpha(77)),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,

@@ -45,6 +45,7 @@ class DiagnosisModel extends DiagnosisEntity {
     );
   }
 
+  @override
   Map<String, dynamic> toJson() {
     return {
       'id': id,
@@ -128,6 +129,7 @@ class TreatmentPlanModel extends TreatmentPlan {
     );
   }
 
+  @override
   Map<String, dynamic> toJson() {
     return {
       'chemical': chemical != null
@@ -172,6 +174,7 @@ class ChemicalTreatmentModel extends ChemicalTreatment {
     );
   }
 
+  @override
   Map<String, dynamic> toJson() {
     return {
       'productName': productName,
@@ -209,6 +212,7 @@ class OrganicTreatmentModel extends OrganicTreatment {
     );
   }
 
+  @override
   Map<String, dynamic> toJson() {
     return {
       'name': name,

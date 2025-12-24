@@ -1,6 +1,7 @@
-import 'dart:io';
 import 'dart:convert';
+import 'dart:io';
 import 'dart:typed_data';
+
 import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
 
@@ -53,9 +54,9 @@ class ImageHelper {
     }
   }
   
-  static Future<String> imageToBase64(File imageFile) async {
-    final bytes = await imageFile.readAsBytes();
-    return base64Encode(bytes);
+  static Future<String> imageToBase64(File imageFile) {
+    final bytes = imageFile.readAsBytesSync();
+    return Future.value(base64Encode(bytes));
   }
   
   static Future<File> base64ToImage(String base64String, String fileName) async {
@@ -66,20 +67,20 @@ class ImageHelper {
     return file;
   }
   
-  static Future<Uint8List> imageToBytes(File imageFile) async {
-    return await imageFile.readAsBytes();
+  static Future<Uint8List> imageToBytes(File imageFile) {
+    return imageFile.readAsBytes();
   }
   
   static Future<File> saveImageLocally(File sourceImage, String fileName) async {
     final directory = await getApplicationDocumentsDirectory();
     final imagesDir = Directory('${directory.path}/images');
     
-    if (!await imagesDir.exists()) {
-      await imagesDir.create(recursive: true);
+    if (!imagesDir.existsSync()) {
+      imagesDir.createSync(recursive: true);
     }
     
     final targetPath = '${imagesDir.path}/$fileName';
-    return await sourceImage.copy(targetPath);
+    return sourceImage.copy(targetPath);
   }
   
   static Future<void> deleteLocalImage(String fileName) async {
@@ -87,8 +88,8 @@ class ImageHelper {
     final imagePath = '${directory.path}/images/$fileName';
     final file = File(imagePath);
     
-    if (await file.exists()) {
-      await file.delete();
+    if (file.existsSync()) {
+      file.deleteSync();
     }
   }
   
@@ -96,11 +97,11 @@ class ImageHelper {
     final directory = await getApplicationDocumentsDirectory();
     final imagesDir = Directory('${directory.path}/images');
     
-    if (!await imagesDir.exists()) {
+    if (!imagesDir.existsSync()) {
       return [];
     }
     
-    final files = await imagesDir.list().toList();
+    final files = imagesDir.listSync();
     return files.whereType<File>().toList();
   }
 }

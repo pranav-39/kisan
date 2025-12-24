@@ -34,8 +34,7 @@ class AppConstants {
 class ApiEndpoints {
   ApiEndpoints._();
   
-  // TODO: Replace with actual Firebase Cloud Function URLs
-  static const String baseUrl = 'https://your-project.cloudfunctions.net';
+  static const String baseUrl = 'https://us-central1-your-project-id.cloudfunctions.net';
   
   static const String diagnoseDisease = '/diagnoseDisease';
   static const String getWeather = '/getWeather';

@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
+
 import 'translations/en_translations.dart';
 import 'translations/hi_translations.dart';
 import 'translations/kn_translations.dart';
-import 'translations/te_translations.dart';
 import 'translations/ta_translations.dart';
+import 'translations/te_translations.dart';
 
 class AppLocalizations {
   final Locale locale;

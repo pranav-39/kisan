@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/localization/app_localizations.dart';
-import '../../../providers/weather_provider.dart';
 import '../../../providers/market_provider.dart';
+import '../../../providers/weather_provider.dart';
 import '../../diagnosis/diagnosis_screen.dart';
-import '../../weather/weather_screen.dart';
 import '../../market/market_screen.dart';
+import '../../weather/weather_screen.dart';
 
 class HomeDashboard extends StatefulWidget {
   const HomeDashboard({super.key});
@@ -412,9 +413,9 @@ class _QuickActionCard extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 16),
         decoration: BoxDecoration(
-          color: color.withOpacity(0.1),
+          color: color.withAlpha(25),
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: color.withOpacity(0.3)),
+          border: Border.all(color: color.withAlpha(77)),
         ),
         child: Column(
           children: [

@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../../../core/constants/app_colors.dart';
+
 import '../../../core/localization/app_localizations.dart';
 import '../../providers/connectivity_provider.dart';
 import '../../widgets/connectivity_banner.dart';
 import '../../widgets/floating_voice_button.dart';
 import '../diagnosis/diagnosis_screen.dart';
-import '../weather/weather_screen.dart';
 import '../market/market_screen.dart';
 import '../settings/settings_screen.dart';
+import '../weather/weather_screen.dart';
 import 'widgets/home_dashboard.dart';
 
 class HomeScreen extends StatefulWidget {

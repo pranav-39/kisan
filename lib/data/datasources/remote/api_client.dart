@@ -11,8 +11,8 @@ class ApiClient {
   ApiClient._internal();
 
   final http.Client _client = http.Client();
-  
-  // TODO: Set this from environment or secure configuration
+
+  // This should be set from a secure configuration, such as Firebase Remote Config or environment variables.
   String? _authToken;
 
   void setAuthToken(String token) {

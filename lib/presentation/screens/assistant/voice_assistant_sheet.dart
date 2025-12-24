@@ -71,9 +71,9 @@ class _VoiceAssistantSheetState extends State<VoiceAssistantSheet> {
   ) {
     return Container(
       padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
+      decoration: const BoxDecoration(
         color: AppColors.primary,
-        borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
       child: Row(
         children: [
@@ -141,7 +141,7 @@ class _VoiceAssistantSheetState extends State<VoiceAssistantSheet> {
             width: 80,
             height: 80,
             decoration: BoxDecoration(
-              color: AppColors.primary.withOpacity(0.1),
+              color: AppColors.primary.withAlpha(25),
               shape: BoxShape.circle,
             ),
             child: const Icon(
@@ -219,7 +219,7 @@ class _VoiceAssistantSheetState extends State<VoiceAssistantSheet> {
         color: Theme.of(context).cardColor,
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.1),
+            color: Colors.black.withAlpha(25),
             blurRadius: 4,
             offset: const Offset(0, -2),
           ),
@@ -305,7 +305,7 @@ class _MessageBubble extends StatelessWidget {
           ),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.05),
+              color: Colors.black.withAlpha(12),
               blurRadius: 4,
               offset: const Offset(0, 2),
             ),

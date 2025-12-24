@@ -53,8 +53,8 @@ class DiagnosisResultCard extends StatelessWidget {
   Widget _buildStatusCard(BuildContext context) {
     return Card(
       color: diagnosis.isHealthy
-          ? AppColors.success.withOpacity(0.1)
-          : AppColors.error.withOpacity(0.1),
+          ? AppColors.success.withAlpha(25)
+          : AppColors.error.withAlpha(25),
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
@@ -330,7 +330,7 @@ class DiagnosisResultCard extends StatelessWidget {
                     width: 24,
                     height: 24,
                     decoration: BoxDecoration(
-                      color: AppColors.secondary.withOpacity(0.1),
+                      color: AppColors.secondary.withAlpha(25),
                       shape: BoxShape.circle,
                     ),
                     child: Center(

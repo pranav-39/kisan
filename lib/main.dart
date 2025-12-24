@@ -1,38 +1,34 @@
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:flutter_localizations/flutter_localizations.dart';
-import 'package:hive_flutter/hive_flutter.dart';
 import 'package:provider/provider.dart';
 
-import 'core/constants/app_constants.dart';
-import 'core/localization/app_localizations.dart';
 import 'core/theme/app_theme.dart';
 import 'data/datasources/local/hive_service.dart';
+import 'data/datasources/remote/api_client.dart';
+import 'data/datasources/remote/gemini_service.dart';
+import 'data/repositories/assistant_repository_impl.dart';
+import 'data/repositories/market_repository_impl.dart';
+import 'firebase_options.dart';
 import 'presentation/providers/connectivity_provider.dart';
+import 'presentation/providers/crop_diagnosis_provider.dart';
 import 'presentation/providers/language_provider.dart';
+import 'presentation/providers/market_provider.dart';
 import 'presentation/providers/theme_provider.dart';
 import 'presentation/providers/voice_assistant_provider.dart';
 import 'presentation/providers/weather_provider.dart';
-import 'presentation/providers/market_provider.dart';
-import 'presentation/providers/crop_diagnosis_provider.dart';
 import 'presentation/screens/splash/splash_screen.dart';
 
-void main() async {
+Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  
-  await SystemChrome.setPreferredOrientations([
-    DeviceOrientation.portraitUp,
-    DeviceOrientation.portraitDown,
-  ]);
-  
-  await Hive.initFlutter();
+
+  // Firebase init
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+
+  // Hive init
   await HiveService.instance.init();
-  
-  // TODO: Initialize Firebase when configured
-  // await Firebase.initializeApp(
-  //   options: DefaultFirebaseOptions.currentPlatform,
-  // );
-  
+
   runApp(const ProjectKisanApp());
 }
 
@@ -43,30 +39,34 @@ class ProjectKisanApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
-        ChangeNotifierProvider(create: (_) => LanguageProvider()),
         ChangeNotifierProvider(create: (_) => ThemeProvider()),
+        ChangeNotifierProvider(create: (_) => LanguageProvider()),
         ChangeNotifierProvider(create: (_) => ConnectivityProvider()),
-        ChangeNotifierProvider(create: (_) => VoiceAssistantProvider()),
-        ChangeNotifierProvider(create: (_) => WeatherProvider()),
-        ChangeNotifierProvider(create: (_) => MarketProvider()),
         ChangeNotifierProvider(create: (_) => CropDiagnosisProvider()),
+        ChangeNotifierProvider(
+          create: (_) => MarketProvider(
+            marketRepository: MarketRepositoryImpl(
+              apiClient: ApiClient.instance,
+            ),
+          ),
+        ),
+        ChangeNotifierProvider(
+          create: (_) => VoiceAssistantProvider(
+            assistantRepository: AssistantRepositoryImpl(
+              geminiService: GeminiService.instance,
+            ),
+          ),
+        ),
+        ChangeNotifierProvider(create: (_) => WeatherProvider()),
       ],
-      child: Consumer2<LanguageProvider, ThemeProvider>(
-        builder: (context, languageProvider, themeProvider, child) {
+      child: Consumer<ThemeProvider>(
+        builder: (context, themeProvider, _) {
           return MaterialApp(
-            title: AppConstants.appName,
+            title: 'Project Kisan',
             debugShowCheckedModeBanner: false,
             theme: AppTheme.lightTheme,
             darkTheme: AppTheme.darkTheme,
             themeMode: themeProvider.themeMode,
-            locale: languageProvider.currentLocale,
-            supportedLocales: AppLocalizations.supportedLocales,
-            localizationsDelegates: const [
-              AppLocalizationsDelegate(),
-              GlobalMaterialLocalizations.delegate,
-              GlobalWidgetsLocalizations.delegate,
-              GlobalCupertinoLocalizations.delegate,
-            ],
             home: const SplashScreen(),
           );
         },

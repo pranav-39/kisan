@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+
 import '../../../core/constants/app_colors.dart';
 import '../../../core/localization/app_localizations.dart';
+import '../../providers/connectivity_provider.dart';
 import '../../providers/language_provider.dart';
 import '../../providers/theme_provider.dart';
-import '../../providers/connectivity_provider.dart';
 
 class SettingsScreen extends StatelessWidget {
   const SettingsScreen({super.key});
@@ -58,8 +59,8 @@ class SettingsScreen extends StatelessWidget {
         Text(
           title,
           style: Theme.of(context).textTheme.titleSmall?.copyWith(
-            color: AppColors.primary,
-          ),
+                color: AppColors.primary,
+              ),
         ),
         const SizedBox(height: 8),
         Card(
@@ -94,15 +95,12 @@ class SettingsScreen extends StatelessWidget {
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: provider.availableLanguages.map((lang) {
-              return RadioListTile<String>(
-                value: lang.code,
-                groupValue: provider.currentLanguageCode,
+              return ListTile(
                 title: Text('${lang.nativeName} (${lang.name})'),
-                onChanged: (value) {
-                  if (value != null) {
-                    provider.setLanguage(value);
-                    Navigator.pop(context);
-                  }
+                selected: provider.isCurrentLanguage(lang.code),
+                onTap: () {
+                  provider.setLanguage(lang.code);
+                  Navigator.pop(context);
                 },
               );
             }).toList(),

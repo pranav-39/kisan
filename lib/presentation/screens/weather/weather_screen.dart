@@ -89,8 +89,8 @@ class _WeatherScreenState extends State<WeatherScreen> {
       child: Container(
         width: double.infinity,
         padding: const EdgeInsets.all(20),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(12),
+        decoration: const BoxDecoration(
+          borderRadius: BorderRadius.all(Radius.circular(12)),
           gradient: LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
@@ -229,7 +229,7 @@ class _WeatherScreenState extends State<WeatherScreen> {
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
         color: isToday
-            ? AppColors.primary.withOpacity(0.1)
+            ? AppColors.primary.withAlpha(25)
             : Theme.of(context).cardColor,
         borderRadius: BorderRadius.circular(12),
         border: isToday
@@ -237,7 +237,7 @@ class _WeatherScreenState extends State<WeatherScreen> {
             : null,
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withAlpha(12),
             blurRadius: 4,
             offset: const Offset(0, 2),
           ),
@@ -395,7 +395,7 @@ class _WeatherScreenState extends State<WeatherScreen> {
         ),
         const SizedBox(height: 12),
         ...weather.advice.alerts.map((alert) => Card(
-          color: AppColors.error.withOpacity(0.1),
+          color: AppColors.error.withAlpha(25),
           child: ListTile(
             leading: const Icon(Icons.warning, color: AppColors.error),
             title: Text(alert.type.toUpperCase()),
