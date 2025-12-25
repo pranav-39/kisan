@@ -1,0 +1,76 @@
+{
+  "project_info": {
+    "project_number": "643626760146",
+    "project_id": "plasma-hope-467112-t6",
+    "storage_bucket": "plasma-hope-467112-t6.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:643626760146:android:f466ba0a46c0c9cdab7a0b",
+        "android_client_info": {
+          "package_name": "com.example.project_kisan"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCNF5SqSa5SuuU4LtUS6lSM_hvB_whjfqY"
+        },
+        {
+          "current_key": "AIzaSyBBcT8NbXt_CczBdYiiP7HLvUQSIRMfU3g"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:643626760146:android:594b786367d61d69ab7a0b",
+        "android_client_info": {
+          "package_name": "com.pr.project_kisan"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCNF5SqSa5SuuU4LtUS6lSM_hvB_whjfqY"
+        },
+        {
+          "current_key": "AIzaSyBBcT8NbXt_CczBdYiiP7HLvUQSIRMfU3g"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:643626760146:android:88f8c22486d9f2c1ab7a0b",
+        "android_client_info": {
+          "package_name": "com.project.kisan.project_kisan"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCNF5SqSa5SuuU4LtUS6lSM_hvB_whjfqY"
+        },
+        {
+          "current_key": "AIzaSyBBcT8NbXt_CczBdYiiP7HLvUQSIRMfU3g"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
