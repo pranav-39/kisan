@@ -68,6 +68,13 @@ class ChatMessageEntity extends Equatable {
     );
   }
 
+  Map<String, String> toGeminiJson() {
+    return {
+      'role': role == MessageRole.user ? 'user' : 'model',
+      'content': content,
+    };
+  }
+
   bool get isUserMessage => role == MessageRole.user;
   bool get isAssistantMessage => role == MessageRole.assistant;
   bool get hasError => errorMessage != null;

@@ -37,8 +37,8 @@ class _HomeDashboardState extends State<HomeDashboard> {
     return RefreshIndicator(
       onRefresh: () async {
         await Future.wait([
-          context.read<WeatherProvider>().loadWeather(forceRefresh: true),
-          context.read<MarketProvider>().loadMarketPrices(forceRefresh: true),
+          context.read<WeatherProvider>().loadWeather(),
+          context.read<MarketProvider>().loadMarketPrices(),
         ]);
       },
       child: SingleChildScrollView(
@@ -125,7 +125,7 @@ class _HomeDashboardState extends State<HomeDashboard> {
         if (provider.hasError || !provider.hasData) {
           return _buildErrorCard(
             'Unable to load weather',
-            onRetry: () => provider.loadWeather(forceRefresh: true),
+            onRetry: () => provider.loadWeather(),
           );
         }
 
@@ -202,18 +202,18 @@ class _HomeDashboardState extends State<HomeDashboard> {
   Widget _buildMarketCard(BuildContext context, AppLocalizations? loc) {
     return Consumer<MarketProvider>(
       builder: (context, provider, child) {
-        if (provider.isLoading) {
+        if (provider.state == MarketLoadingState.loading) {
           return _buildLoadingCard('Loading market prices...');
         }
 
-        if (provider.hasError || !provider.hasData) {
+        if (provider.state == MarketLoadingState.error) {
           return _buildErrorCard(
             'Unable to load market prices',
-            onRetry: () => provider.loadMarketPrices(forceRefresh: true),
+            onRetry: () => provider.loadMarketPrices(),
           );
         }
 
-        final prices = provider.allPrices.take(3).toList();
+        final prices = provider.prices.take(3).toList();
         return Card(
           child: Padding(
             padding: const EdgeInsets.all(16),
@@ -251,49 +251,15 @@ class _HomeDashboardState extends State<HomeDashboard> {
                               style: Theme.of(context).textTheme.titleSmall,
                             ),
                             Text(
-                              price.mandiName,
+                              price.marketName,
                               style: Theme.of(context).textTheme.bodySmall,
                             ),
                           ],
                         ),
                       ),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.end,
-                        children: [
-                          Text(
-                            '₹${price.pricePerQuintal.round()}',
-                            style: Theme.of(context).textTheme.titleMedium,
-                          ),
-                          Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Icon(
-                                price.trend.name == 'up'
-                                    ? Icons.arrow_upward
-                                    : price.trend.name == 'down'
-                                        ? Icons.arrow_downward
-                                        : Icons.remove,
-                                size: 14,
-                                color: price.trend.name == 'up'
-                                    ? AppColors.trendUp
-                                    : price.trend.name == 'down'
-                                        ? AppColors.trendDown
-                                        : AppColors.trendNeutral,
-                              ),
-                              Text(
-                                '${price.percentChange.abs().toStringAsFixed(1)}%',
-                                style: TextStyle(
-                                  fontSize: 12,
-                                  color: price.trend.name == 'up'
-                                      ? AppColors.trendUp
-                                      : price.trend.name == 'down'
-                                          ? AppColors.trendDown
-                                          : AppColors.trendNeutral,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ],
+                      Text(
+                        '₹${price.modalPrice.round()}',
+                        style: Theme.of(context).textTheme.titleMedium,
                       ),
                     ],
                   ),

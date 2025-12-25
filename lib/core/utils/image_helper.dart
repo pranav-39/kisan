@@ -66,8 +66,8 @@ class ImageHelper {
     await file.writeAsBytes(bytes);
     return file;
   }
-  
-  static Future<Uint8List> imageToBytes(File imageFile) {
+
+  static Future<Uint8List> imageToBytes(File imageFile) async {
     return imageFile.readAsBytes();
   }
   

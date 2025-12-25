@@ -1,65 +1,93 @@
-// This is a basic Flutter widget test.
-//
-// To perform an interaction with a widget in your test, use the WidgetTester
-// utility in the flutter_test package. For example, you can send tap and scroll
-// gestures. You can also use WidgetTester to find child widgets in the widget
-// tree, read text, and verify that the values of widget properties are correct.
-
-import 'dart:io';
-
 import 'package:flutter_test/flutter_test.dart';
-import 'package:project_kisan/domain/entities/diagnosis_entity.dart';
-import 'package:project_kisan/domain/repositories/diagnosis_repository.dart';
+import 'package:project_kisan/domain/entities/chat_message_entity.dart';
+import 'package:project_kisan/domain/entities/market_price_entity.dart';
+import 'package:project_kisan/domain/repositories/assistant_repository.dart';
+import 'package:project_kisan/domain/repositories/market_repository.dart';
+
 import 'package:project_kisan/main.dart';
 
-class MockDiagnosisRepository implements DiagnosisRepository {
+class MockMarketRepository implements MarketRepository {
   @override
-  Future<void> clearHistory() async {}
-
-  @override
-  Future<void> deleteDiagnosis(String id) async {}
-
-  @override
-  Future<DiagnosisEntity> diagnoseCrop(
-      {required File imageFile, required String cropType}) async {
-    return DiagnosisEntity(
-        id: 'test',
-        cropType: 'test',
-        imagePath: 'test',
-        isHealthy: true,
-        confidence: 1.0,
-        diagnosedAt: DateTime.now());
+  Future<List<MarketPriceEntity>> getMarketPrices(
+      String crop, String location) async {
+    return [];
   }
 
   @override
-  Future<DiagnosisEntity?> getDiagnosisById(String id) async {
+  Future<List<String>> getSupportedCrops() async {
+    return [];
+  }
+
+  @override
+  Future<List<String>> getSupportedLocations() async {
+    return [];
+  }
+}
+
+class MockAssistantRepository implements AssistantRepository {
+  @override
+  Future<void> clearConversation() async {}
+
+  @override
+  Future<List<String>> getSuggestedCommands(String? languageCode) async {
+    return [];
+  }
+
+  @override
+  Future<ConversationContext?> loadConversation() async {
     return null;
   }
 
   @override
-  Future<List<DiagnosisEntity>> getDiagnosisHistory() async {
-    return [];
+  Future<ChatMessageEntity> processVoiceInput(
+      {required String audioPath,
+      required ConversationContext context,
+      String? languageCode}) async {
+    return ChatMessageEntity(
+      id: '1',
+      role: MessageRole.user,
+      type: MessageType.text,
+      content: 'Hello',
+      timestamp: DateTime.now(),
+    );
   }
 
   @override
-  Future<List<DiagnosisEntity>> getUnsyncedDiagnoses() async {
-    return [];
+  Future<void> saveConversation(ConversationContext context) async {}
+
+  @override
+  Future<ChatMessageEntity> sendMessage(
+      {required String message,
+      required ConversationContext context,
+      String? languageCode}) async {
+    return ChatMessageEntity(
+      id: '2',
+      role: MessageRole.assistant,
+      type: MessageType.text,
+      content: 'Hi',
+      timestamp: DateTime.now(),
+    );
   }
 
   @override
-  Future<void> markAsSynced(String id) async {}
+  Future<String> speechToText(
+      {required String audioPath, String? languageCode}) async {
+    return 'Hello';
+  }
 
   @override
-  Future<void> saveDiagnosis(DiagnosisEntity diagnosis) async {}
-
-  @override
-  Future<void> syncDiagnoses() async {}
+  Future<String> textToSpeech({required String text, String? languageCode}) async {
+    return '';
+  }
 }
 
 void main() {
   testWidgets('App smoke test', (WidgetTester tester) async {
     // Build our app and trigger a frame.
-    await tester.pumpWidget(const ProjectKisanApp());
+    await tester.pumpWidget(ProjectKisanApp(
+      marketRepository: MockMarketRepository(),
+      assistantRepository: MockAssistantRepository(),
+    ));
 
     // Verify that the app builds without crashing.
     expect(find.byType(ProjectKisanApp), findsOneWidget);

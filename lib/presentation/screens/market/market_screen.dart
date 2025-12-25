@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../core/localization/app_localizations.dart';
-import '../../../domain/entities/market_entity.dart';
+import '../../../domain/entities/market_price_entity.dart';
 import '../../providers/market_provider.dart';
 
 class MarketScreen extends StatefulWidget {
@@ -18,9 +18,7 @@ class _MarketScreenState extends State<MarketScreen> {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final provider = context.read<MarketProvider>();
-      if (!provider.hasData) {
-        provider.loadMarketPrices();
-      }
+      provider.loadMarketPrices();
     });
   }
 
@@ -63,6 +61,7 @@ class _MarketScreenState extends State<MarketScreen> {
         children: [
           Expanded(
             child: DropdownButtonFormField<String>(
+              initialValue: provider.selectedCrop,
               decoration: InputDecoration(
                 labelText: loc?.selectCrop ?? 'Select Crop',
                 contentPadding: const EdgeInsets.symmetric(horizontal: 12),
@@ -70,17 +69,11 @@ class _MarketScreenState extends State<MarketScreen> {
                   borderRadius: BorderRadius.circular(8),
                 ),
               ),
-              items: [
-                const DropdownMenuItem<String>(
+              items: const [
+                DropdownMenuItem<String>(
                   value: null,
                   child: Text('All Crops'),
                 ),
-                ...provider.availableCrops.map((crop) {
-                  return DropdownMenuItem<String>(
-                    value: crop,
-                    child: Text(crop),
-                  );
-                }),
               ],
               onChanged: (value) {
                 provider.setSelectedCrop(value);
@@ -89,12 +82,7 @@ class _MarketScreenState extends State<MarketScreen> {
           ),
           const SizedBox(width: 12),
           IconButton(
-            onPressed: () => provider.clearFilters(),
-            icon: const Icon(Icons.clear_all),
-            tooltip: 'Clear filters',
-          ),
-          IconButton(
-            onPressed: () => provider.loadMarketPrices(forceRefresh: true),
+            onPressed: () => provider.loadMarketPrices(),
             icon: const Icon(Icons.refresh),
             tooltip: 'Refresh',
           ),
@@ -108,11 +96,11 @@ class _MarketScreenState extends State<MarketScreen> {
     MarketProvider provider,
     AppLocalizations? loc,
   ) {
-    if (provider.isLoading) {
+    if (provider.state == MarketLoadingState.loading) {
       return const Center(child: CircularProgressIndicator());
     }
 
-    if (provider.hasError) {
+    if (provider.state == MarketLoadingState.error) {
       return Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -122,7 +110,7 @@ class _MarketScreenState extends State<MarketScreen> {
             Text(provider.errorMessage ?? 'Unable to load market prices'),
             const SizedBox(height: 16),
             ElevatedButton.icon(
-              onPressed: () => provider.loadMarketPrices(forceRefresh: true),
+              onPressed: () => provider.loadMarketPrices(),
               icon: const Icon(Icons.refresh),
               label: const Text('Retry'),
             ),
@@ -132,25 +120,20 @@ class _MarketScreenState extends State<MarketScreen> {
     }
 
     if (provider.prices.isEmpty) {
-      return Center(
+      return const Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Icon(Icons.store_outlined, size: 64, color: AppColors.textSecondaryLight),
-            const SizedBox(height: 16),
-            const Text('No prices available for selected filters'),
-            const SizedBox(height: 16),
-            TextButton(
-              onPressed: () => provider.clearFilters(),
-              child: const Text('Clear Filters'),
-            ),
+            Icon(Icons.store_outlined, size: 64, color: AppColors.textSecondaryLight),
+            SizedBox(height: 16),
+            Text('No prices available for selected filters'),
           ],
         ),
       );
     }
 
     return RefreshIndicator(
-      onRefresh: () => provider.loadMarketPrices(forceRefresh: true),
+      onRefresh: () => provider.loadMarketPrices(),
       child: ListView.builder(
         padding: const EdgeInsets.all(16),
         itemCount: provider.prices.length,
@@ -204,7 +187,7 @@ class _MarketPriceCard extends StatelessWidget {
                           const Icon(Icons.store, size: 14, color: AppColors.textSecondaryLight),
                           const SizedBox(width: 4),
                           Text(
-                            '${price.mandiName}, ${price.state}',
+                            price.marketName,
                             style: Theme.of(context).textTheme.bodySmall,
                           ),
                         ],
@@ -216,7 +199,7 @@ class _MarketPriceCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
                     Text(
-                      '₹${price.pricePerQuintal.round()}',
+                      '₹${price.modalPrice.round()}',
                       style: Theme.of(context).textTheme.titleLarge?.copyWith(
                         fontWeight: FontWeight.bold,
                       ),
@@ -232,131 +215,15 @@ class _MarketPriceCard extends StatelessWidget {
             const Divider(height: 24),
             Row(
               children: [
-                _buildPriceChange(context),
-                const SizedBox(width: 16),
-                _buildRecommendation(context),
                 const Spacer(),
                 Text(
-                  _formatDate(price.updatedAt),
+                  _formatDate(price.lastUpdated),
                   style: Theme.of(context).textTheme.bodySmall,
                 ),
               ],
             ),
-            if (price.aiInsight.isNotEmpty) ...[
-              const SizedBox(height: 12),
-              Container(
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color: AppColors.secondary.withAlpha(12),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Icon(
-                      Icons.auto_awesome,
-                      size: 16,
-                      color: AppColors.secondary,
-                    ),
-                    const SizedBox(width: 8),
-                    Expanded(
-                      child: Text(
-                        price.aiInsight,
-                        style: Theme.of(context).textTheme.bodySmall,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
           ],
         ),
-      ),
-    );
-  }
-
-  Widget _buildPriceChange(BuildContext context) {
-    final isUp = price.trend == PriceTrend.up;
-    final isDown = price.trend == PriceTrend.down;
-    final color = isUp
-        ? AppColors.trendUp
-        : isDown
-            ? AppColors.trendDown
-            : AppColors.trendNeutral;
-    final icon = isUp
-        ? Icons.trending_up
-        : isDown
-            ? Icons.trending_down
-            : Icons.trending_flat;
-
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-      decoration: BoxDecoration(
-        color: color.withAlpha(25),
-        borderRadius: BorderRadius.circular(4),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(icon, size: 14, color: color),
-          const SizedBox(width: 4),
-          Text(
-            '${price.percentChange >= 0 ? '+' : ''}${price.percentChange.toStringAsFixed(1)}%',
-            style: TextStyle(
-              color: color,
-              fontWeight: FontWeight.bold,
-              fontSize: 12,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildRecommendation(BuildContext context) {
-    Color color;
-    String label;
-    IconData icon;
-
-    switch (price.recommendation) {
-      case MarketRecommendation.buy:
-        color = AppColors.trendUp;
-        label = 'BUY';
-        icon = Icons.arrow_circle_down;
-        break;
-      case MarketRecommendation.sell:
-        color = AppColors.trendDown;
-        label = 'SELL';
-        icon = Icons.arrow_circle_up;
-        break;
-      case MarketRecommendation.hold:
-        color = AppColors.warning;
-        label = 'HOLD';
-        icon = Icons.pause_circle;
-        break;
-    }
-
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-      decoration: BoxDecoration(
-        color: color.withAlpha(25),
-        borderRadius: BorderRadius.circular(4),
-        border: Border.all(color: color.withAlpha(77)),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(icon, size: 14, color: color),
-          const SizedBox(width: 4),
-          Text(
-            label,
-            style: TextStyle(
-              color: color,
-              fontWeight: FontWeight.bold,
-              fontSize: 12,
-            ),
-          ),
-        ],
       ),
     );
   }

@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 
 import '../../../core/constants/app_colors.dart';
 import '../../../core/localization/app_localizations.dart';
+import '../../../data/datasources/local/hive_service.dart';
 import '../../providers/connectivity_provider.dart';
 import '../../providers/language_provider.dart';
 import '../../providers/theme_provider.dart';
@@ -64,9 +65,7 @@ class SettingsScreen extends StatelessWidget {
         ),
         const SizedBox(height: 8),
         Card(
-          child: Column(
-            children: tiles,
-          ),
+          child: Column(children: tiles),
         ),
       ],
     );
@@ -89,24 +88,22 @@ class SettingsScreen extends StatelessWidget {
 
     showDialog(
       context: context,
-      builder: (context) {
-        return AlertDialog(
-          title: const Text('Select Language'),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: provider.availableLanguages.map((lang) {
-              return ListTile(
-                title: Text('${lang.nativeName} (${lang.name})'),
-                selected: provider.isCurrentLanguage(lang.code),
-                onTap: () {
-                  provider.setLanguage(lang.code);
-                  Navigator.pop(context);
-                },
-              );
-            }).toList(),
-          ),
-        );
-      },
+      builder: (context) => AlertDialog(
+        title: const Text('Select Language'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: provider.availableLanguages.map((lang) {
+            return ListTile(
+              title: Text('${lang.nativeName} (${lang.name})'),
+              selected: provider.isCurrentLanguage(lang.code),
+              onTap: () {
+                provider.setLanguage(lang.code);
+                Navigator.pop(context);
+              },
+            );
+          }).toList(),
+        ),
+      ),
     );
   }
 
@@ -119,7 +116,7 @@ class SettingsScreen extends StatelessWidget {
       ),
       title: const Text('Dark Mode'),
       value: provider.isDarkMode,
-      onChanged: (value) => provider.toggleDarkMode(),
+      onChanged: (_) => provider.toggleDarkMode(),
     );
   }
 
@@ -150,33 +147,41 @@ class SettingsScreen extends StatelessWidget {
   void _showClearCacheDialog(BuildContext context) {
     showDialog(
       context: context,
-      builder: (context) {
-        return AlertDialog(
-          title: const Text('Clear Cache'),
-          content: const Text(
-            'This will clear all locally stored weather, market prices, and diagnosis history. This action cannot be undone.',
+      builder: (context) => AlertDialog(
+        title: const Text('Clear Cache'),
+        content: const Text(
+          'This will clear all locally stored weather, market prices, and diagnosis history. This action cannot be undone.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancel'),
           ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text('Cancel'),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.error,
             ),
-            ElevatedButton(
-              onPressed: () {
-                // TODO: Implement cache clearing
+            onPressed: () async {
+              final hive = HiveService.instance;
+
+              await hive.clearWeatherCache();
+              await hive.clearMarketCache();
+              await hive.clearDiagnosisHistory();
+              await hive.clearOfflineQueue();
+
+              if (context.mounted) {
                 Navigator.pop(context);
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Cache cleared successfully')),
+                  const SnackBar(
+                    content: Text('Cache cleared successfully'),
+                  ),
                 );
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.error,
-              ),
-              child: const Text('Clear'),
-            ),
-          ],
-        );
-      },
+              }
+            },
+            child: const Text('Clear'),
+          ),
+        ],
+      ),
     );
   }
 
@@ -203,8 +208,8 @@ class SettingsScreen extends StatelessWidget {
         ),
         child: const Icon(Icons.eco, size: 40, color: Colors.white),
       ),
-      children: [
-        const Text(
+      children: const [
+        Text(
           'Project Kisan is an AI-powered farming intelligence platform designed to help Indian farmers with crop disease diagnosis, weather-based advice, market prices, and government schemes.',
         ),
       ],

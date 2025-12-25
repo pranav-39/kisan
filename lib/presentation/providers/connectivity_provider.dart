@@ -29,8 +29,8 @@ class ConnectivityProvider extends ChangeNotifier {
     
     notifyListeners();
   }
-  
-  Future<bool> checkConnection() {
+
+  Future<bool> checkConnection() async {
     return _connectivityHelper.checkConnection();
   }
   

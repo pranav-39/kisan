@@ -16,6 +16,7 @@ enum VoiceAssistantState {
 
 class VoiceAssistantProvider extends ChangeNotifier {
   final AssistantRepository assistantRepository;
+
   final SpeechToText _speechToText = SpeechToText();
   final FlutterTts _flutterTts = FlutterTts();
 
@@ -29,7 +30,9 @@ class VoiceAssistantProvider extends ChangeNotifier {
     _initTts();
   }
 
-  void _initSpeech() async {
+  /* ---------------- INIT ---------------- */
+
+  Future<void> _initSpeech() async {
     _isMicAvailable = await _speechToText.initialize(
       onError: (error) => _handleError(error.errorMsg),
     );
@@ -43,16 +46,21 @@ class VoiceAssistantProvider extends ChangeNotifier {
     });
   }
 
+  /* ---------------- GETTERS ---------------- */
+
   VoiceAssistantState get state => _state;
   ConversationContext get context => _context;
   List<ChatMessageEntity> get messages => _context.messages;
   String? get errorMessage => _errorMessage;
   bool get isMicAvailable => _isMicAvailable;
+
   bool get isIdle => _state == VoiceAssistantState.idle;
   bool get isListening => _state == VoiceAssistantState.listening;
   bool get isProcessing => _state == VoiceAssistantState.processing;
   bool get isSpeaking => _state == VoiceAssistantState.speaking;
   bool get hasError => _state == VoiceAssistantState.error;
+
+  /* ---------------- VOICE INPUT ---------------- */
 
   Future<void> startListening() async {
     if (!_isMicAvailable || _state == VoiceAssistantState.listening) return;
@@ -80,6 +88,8 @@ class VoiceAssistantProvider extends ChangeNotifier {
     }
   }
 
+  /* ---------------- CHAT ---------------- */
+
   Future<void> sendTextMessage(String text) async {
     if (text.trim().isEmpty) return;
 
@@ -96,25 +106,9 @@ class VoiceAssistantProvider extends ChangeNotifier {
     notifyListeners();
 
     try {
-      final assistantMessage = await assistantRepository.sendMessage(_context, text);
-      _addMessage(assistantMessage);
-      _state = VoiceAssistantState.idle;
-    } catch (e) {
-      _state = VoiceAssistantState.error;
-      _errorMessage = e.toString();
-    }
+      final assistantMessage =
+          await assistantRepository.sendMessage(context: _context, message: text);
 
-    notifyListeners();
-  }
-
-  Future<void> sendVoiceMessage(String audioPath) async {
-    _state = VoiceAssistantState.processing;
-    notifyListeners();
-
-    try {
-      // TODO: Convert audio to text
-      final text = await _audioToText(audioPath);
-      final assistantMessage = await assistantRepository.sendMessage(_context, text);
       _addMessage(assistantMessage);
       await _speak(assistantMessage.content);
     } catch (e) {
@@ -122,11 +116,16 @@ class VoiceAssistantProvider extends ChangeNotifier {
     }
   }
 
-  Future<String> _audioToText(String audioPath) {
-    // This is a placeholder. In a real app, you would use a speech-to-text service
-    // to convert the audio at `audioPath` to text.
-    return Future.delayed(const Duration(seconds: 1), () => 'What is the price of wheat?');
+  /* ---------------- AUDIO FILE (EXPLICITLY UNSUPPORTED) ---------------- */
+
+  Future<void> sendVoiceMessage(String audioPath) async {
+    _handleError(
+      'Audio file speech recognition is not supported. '
+      'Please use live microphone input.',
+    );
   }
+
+  /* ---------------- TEXT TO SPEECH ---------------- */
 
   Future<void> _speak(String text) async {
     _state = VoiceAssistantState.speaking;
@@ -134,9 +133,13 @@ class VoiceAssistantProvider extends ChangeNotifier {
     await _flutterTts.speak(text);
   }
 
+  /* ---------------- STATE HELPERS ---------------- */
+
   void _addMessage(ChatMessageEntity message) {
-    final updatedMessages = [..._context.messages, message];
-    _context = _context.copyWith(messages: updatedMessages);
+    _context = _context.copyWith(
+      messages: [..._context.messages, message],
+    );
+    notifyListeners();
   }
 
   void clearConversation() {
@@ -157,7 +160,7 @@ class VoiceAssistantProvider extends ChangeNotifier {
   }
 
   List<String> getSuggestedCommands() {
-    return [
+    return const [
       'What is the price of wheat today?',
       'Should I irrigate my field tomorrow?',
       'Scan my tomato plant for diseases',
